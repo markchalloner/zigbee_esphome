@@ -1,6 +1,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_check.h"
+#include "esp_coexist.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "zigbee.h"
@@ -100,6 +101,9 @@ void esp_zb_app_signal_handler(esp_zb_app_signal_t *signal_struct) {
   esp_zb_zdo_signal_leave_params_t *leave_params = NULL;
   switch (sig_type) {
     case ESP_ZB_ZDO_SIGNAL_SKIP_STARTUP:
+#if CONFIG_ESP_WIFI_ENABLED && CONFIG_ESP_COEX_SW_COEXIST_ENABLE
+      esp_coex_wifi_i154_enable();
+#endif
       // Notifies the application that ZBOSS framework (scheduler, buffer pool, etc.) has started, but no
       // join/rejoin/formation/BDB initialization has been done yet.
       ESP_LOGI(TAG, "SKIP_STARTUP. Device started up in %sfactory-reset mode",
